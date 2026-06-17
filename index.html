@@ -124,21 +124,38 @@ const sendBtn = document.querySelector('.send-btn');
 
 // On button click
 sendBtn.addEventListener('click', function () {
-  const templateParams = {
-    name: contactDiv.querySelector('[name="name"]').value,
-    email: contactDiv.querySelector('[name="email"]').value,
-    message: contactDiv.querySelector('[name="message"]').value
-  };
+  const nameVal = contactDiv.querySelector('[name="name"]').value.trim();
+  const emailVal = contactDiv.querySelector('[name="email"]').value.trim();
+  const messageVal = contactDiv.querySelector('[name="message"]').value.trim();
+
+  if (!nameVal || !emailVal || !messageVal) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(emailVal)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  const templateParams = { name: nameVal, email: emailVal, message: messageVal };
+
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Sending...';
 
   emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
     .then(() => {
-      alert('✅ Message sent successfully!');   // or show your own success message
-      // optional: clear fields
+      alert('✅ Message sent successfully!');
       contactDiv.querySelectorAll('input, textarea').forEach(el => el.value = '');
     })
     .catch((err) => {
       console.error(err);
       alert('❌ Failed to send. Check console.');
+    })
+    .finally(() => {
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'SEND MESSAGE';
     });
 });
     </script>
